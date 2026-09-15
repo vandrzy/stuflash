@@ -2,24 +2,10 @@ import { DeckCategory, FlashcardQuestion } from '../types/flashcard';
 
 export const DECK_CATEGORIES: DeckCategory[] = [
   {
-    id: 'all',
-    name: 'All Subjects Mixed Deck',
-    description: 'A comprehensive mix of science, geography, tech, and general knowledge questions.',
-    icon: '🌟',
-    questionCount: 12,
-  },
-  {
     id: 'science',
     name: 'Science & Nature',
     description: 'Explore biology, physics, chemistry, and space phenomena.',
     icon: '🧪',
-    questionCount: 4,
-  },
-  {
-    id: 'geography',
-    name: 'World Geography',
-    description: 'Test your knowledge of capitals, landmarks, oceans, and continents.',
-    icon: '🌍',
     questionCount: 4,
   },
   {
@@ -28,6 +14,13 @@ export const DECK_CATEGORIES: DeckCategory[] = [
     description: 'Master concepts in web development, computer science, and algorithms.',
     icon: '💻',
     questionCount: 4,
+  },
+  {
+    id: 'generate',
+    name: 'Generate Flashcard',
+    description: 'Create your own flashcard using your material',
+    icon: '✨',
+    questionCount: 0,
   },
 ];
 
@@ -64,40 +57,6 @@ export const FLASHCARD_QUESTIONS: FlashcardQuestion[] = [
     options: ['300,000 km/s', '150,000 km/s', '1,000,000 km/s', '30,000 km/s'],
     correctAnswerIndex: 0,
     explanation: 'The speed of light in a vacuum is defined as exactly 299,792,458 meters per second (~300,000 km/s).',
-  },
-
-  // World Geography
-  {
-    id: 'geo-1',
-    category: 'geography',
-    question: 'What is the capital city of Australia?',
-    options: ['Sydney', 'Melbourne', 'Canberra', 'Brisbane'],
-    correctAnswerIndex: 2,
-    explanation: 'Canberra was chosen as the capital in 1908 as a compromise between Sydney and Melbourne.',
-  },
-  {
-    id: 'geo-2',
-    category: 'geography',
-    question: 'Which ocean is the largest and deepest on Planet Earth?',
-    options: ['Atlantic Ocean', 'Indian Ocean', 'Arctic Ocean', 'Pacific Ocean'],
-    correctAnswerIndex: 3,
-    explanation: 'The Pacific Ocean covers over 30% of the Earth’s surface area and houses the Mariana Trench.',
-  },
-  {
-    id: 'geo-3',
-    category: 'geography',
-    question: 'Which river is widely recognized as the longest river in the world?',
-    options: ['Amazon River', 'Nile River', 'Mississippi River', 'Yangtze River'],
-    correctAnswerIndex: 1,
-    explanation: 'The Nile River in Africa spans approximately 6,650 kilometers (4,132 miles).',
-  },
-  {
-    id: 'geo-4',
-    category: 'geography',
-    question: 'On which continent would you find the Atacama Desert, the driest non-polar desert in the world?',
-    options: ['Africa', 'Asia', 'South America', 'Australia'],
-    correctAnswerIndex: 2,
-    explanation: 'The Atacama Desert is located in northern Chile, South America.',
   },
 
   // Tech & Computing
