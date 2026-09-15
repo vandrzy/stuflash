@@ -81,7 +81,7 @@ export default function Home() {
   // Answer submit handler for current question
   const handleAnswerSubmit = (selectedIndex: number) => {
     const currentQ = activeQuestions[currentQuestionIndex];
-    const isCorrect = selectedIndex === currentQ.correctAnswerIndex;
+    const isCorrect = selectedIndex >= 0 && selectedIndex === currentQ.correctAnswerIndex;
 
     const pointsEarned = isCorrect ? 100 : 0;
     setScore((prev) => prev + pointsEarned);
@@ -90,7 +90,7 @@ export default function Home() {
       questionId: currentQ.id,
       question: currentQ.question,
       selectedOptionIndex: selectedIndex,
-      selectedOptionText: currentQ.options[selectedIndex],
+      selectedOptionText: selectedIndex >= 0 ? currentQ.options[selectedIndex] : 'Waktu Habis / Tidak Dijawab',
       correctOptionIndex: currentQ.correctAnswerIndex,
       correctOptionText: currentQ.options[currentQ.correctAnswerIndex],
       isCorrect,
@@ -154,6 +154,7 @@ export default function Home() {
             currentIndex={currentQuestionIndex}
             totalQuestions={activeQuestions.length}
             score={score}
+            difficulty={activeDifficulty}
             onAnswerSubmit={handleAnswerSubmit}
             onNextQuestion={handleNextQuestion}
             isLastQuestion={currentQuestionIndex === activeQuestions.length - 1}

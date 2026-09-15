@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { FlashcardQuestion } from '../types/flashcard';
+import React, { useState, useEffect, useRef } from 'react';
+import { FlashcardQuestion, DifficultyLevel } from '../types/flashcard';
 import { AnswerCardGroup } from './AnswerCardGroup';
 
 interface QuestionViewProps {
@@ -9,6 +9,7 @@ interface QuestionViewProps {
   currentIndex: number;
   totalQuestions: number;
   score: number;
+  difficulty: DifficultyLevel;
   onAnswerSubmit: (selectedIndex: number) => void;
   onNextQuestion: () => void;
   isLastQuestion: boolean;
@@ -19,47 +20,110 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
   currentIndex,
   totalQuestions,
   score,
+  difficulty,
   onAnswerSubmit,
   onNextQuestion,
   isLastQuestion,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [phase, setPhase] = useState<'answering' | 'paused'>('answering');
 
-  const handleSelectOption = (index: number) => {
-    if (isSubmitted) return;
-    setSelectedIndex(index);
-    setIsSubmitted(true);
-    onAnswerSubmit(index);
+  // Determine answering duration based on difficulty level
+  const answeringDurationSeconds = difficulty === 'easy' ? 45 : difficulty === 'medium' ? 30 : 20;
+  const pauseDurationSeconds = 6;
+
+  const [timeLeft, setTimeLeft] = useState<number>(answeringDurationSeconds);
+
+  // References to keep track of timing accurately and avoid stale closures
+  const phaseRef = useRef<'answering' | 'paused'>('answering');
+  const isSubmittedRef = useRef<boolean>(false);
+  const endTimeRef = useRef<number>(Date.now() + answeringDurationSeconds * 1000);
+
+  // Synchronize state with refs
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
+  useEffect(() => {
+    isSubmittedRef.current = isSubmitted;
+  }, [isSubmitted]);
+
+  // Start 6-second pause timer after answer or timeout
+  const startPauseTimer = () => {
+    setPhase('paused');
+    phaseRef.current = 'paused';
+    endTimeRef.current = Date.now() + pauseDurationSeconds * 1000;
+    setTimeLeft(pauseDurationSeconds);
   };
 
-  const isCorrect = selectedIndex !== null && selectedIndex === question.correctAnswerIndex;
+  // Main countdown timer effect
+  useEffect(() => {
+    endTimeRef.current = Date.now() + answeringDurationSeconds * 1000;
+    setTimeLeft(answeringDurationSeconds);
+
+    const interval = setInterval(() => {
+      const remainingSeconds = Math.max(0, (endTimeRef.current - Date.now()) / 1000);
+      setTimeLeft(remainingSeconds);
+
+      if (remainingSeconds <= 0) {
+        if (phaseRef.current === 'answering' && !isSubmittedRef.current) {
+          // Timeout occurred before user answered
+          setIsSubmitted(true);
+          isSubmittedRef.current = true;
+          setSelectedIndex(-1);
+          onAnswerSubmit(-1);
+          startPauseTimer();
+        } else if (phaseRef.current === 'paused') {
+          // Pause timer finished, proceed automatically to next question
+          clearInterval(interval);
+          onNextQuestion();
+        }
+      }
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [answeringDurationSeconds]);
+
+  const handleSelectOption = (index: number) => {
+    if (isSubmittedRef.current) return;
+    setIsSubmitted(true);
+    isSubmittedRef.current = true;
+    setSelectedIndex(index);
+    onAnswerSubmit(index);
+    startPauseTimer();
+  };
+
+  const currentMaxDuration = phase === 'answering' ? answeringDurationSeconds : pauseDurationSeconds;
+  const timerPercentage = Math.min(100, Math.max(0, (timeLeft / currentMaxDuration) * 100));
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 py-6 flex flex-col items-center">
       {/* Top Header Bar */}
       <div className="w-full flex items-center justify-between mb-4 bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/20 shadow-md">
         <div className="flex items-center gap-2 text-sm sm:text-base font-extrabold text-[#fbf8e0]">
-          <span className="bg-[#518dff] px-3 py-1 rounded-xl shadow-sm">
+          <span className="bg-white/20 px-3 py-1 rounded-xl shadow-sm">
             Question {currentIndex + 1} / {totalQuestions}
-          </span>
-          <span className="capitalize text-xs bg-white/20 px-2.5 py-1 rounded-lg">
-            {question.category}
           </span>
         </div>
 
         <div className="flex items-center gap-2 text-sm sm:text-base font-black text-[#fbf8e0]">
-          <span>⭐ Score:</span>
+
           <span className="bg-white/20 px-3 py-1 rounded-xl">{score} pts</span>
         </div>
       </div>
 
-      {/* Progress Bar */}
-      <div className="w-full h-3 bg-black/20 rounded-full overflow-hidden mb-6 border border-white/10 p-0.5">
-        <div
-          className="h-full bg-gradient-to-r from-blue-300 via-[#518dff] to-emerald-400 rounded-full transition-all duration-300 shadow"
-          style={{ width: `${((currentIndex + 1) / totalQuestions) * 100}%` }}
-        />
+      {/* Timer Bar */}
+      <div className="w-full mb-6">
+        <div className="w-full h-3.5 bg-black/25 rounded-full overflow-hidden border border-white/15 p-0.5 shadow-inner">
+          <div
+            className={`h-full rounded-full transition-all duration-75 shadow-md ${phase === 'answering'
+              ? 'bg-gradient-to-r from-blue-300 via-[#518dff] to-emerald-400'
+              : 'bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 animate-pulse'
+              }`}
+            style={{ width: `${timerPercentage}%` }}
+          />
+        </div>
       </div>
 
       {/* Flashcard Question Box */}
@@ -85,35 +149,7 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
           onSelectOption={handleSelectOption}
         />
       </div>
-
-      {/* Feedback & Explanation Box */}
-      {isSubmitted && (
-        <div
-          className={`w-full rounded-2xl p-5 border-2 shadow-xl mb-6 backdrop-blur-md transition-all duration-300 ${
-            isCorrect
-              ? 'bg-[#116b09]/90 border-white text-[#fbf8e0]'
-              : 'bg-[#c60707]/90 border-white text-[#fbf8e0]'
-          }`}
-        >
-          <div className="flex items-center gap-3 font-black text-lg mb-2">
-            <span className="text-2xl">{isCorrect ? '🎉 Correct!' : '❌ Incorrect'}</span>
-          </div>
-
-          <p className="text-sm sm:text-base font-semibold text-[#fbf8e0]/95 leading-relaxed bg-black/15 p-3 rounded-xl border border-white/10">
-            <strong>Explanation:</strong> {question.explanation}
-          </p>
-
-          <div className="mt-4 flex justify-end">
-            <button
-              type="button"
-              onClick={onNextQuestion}
-              className="px-6 py-3 bg-white text-slate-900 font-extrabold text-base rounded-xl shadow-lg hover:bg-slate-100 active:scale-95 transition-all cursor-pointer flex items-center gap-2"
-            >
-              {isLastQuestion ? 'View Results 🏆' : 'Next Question ➔'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
+
