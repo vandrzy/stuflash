@@ -15,6 +15,7 @@ export default function Home() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [streak, setStreak] = useState<number>(0);
+  const [maxStreak, setMaxStreak] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<UserAnswerRecord[]>([]);
   const [gameSummary, setGameSummary] = useState<GameSummary | null>(null);
 
@@ -75,6 +76,7 @@ export default function Home() {
     setCurrentQuestionIndex(0);
     setScore(0);
     setStreak(0);
+    setMaxStreak(0);
     setUserAnswers([]);
     setGameSummary(null);
     setScreenState('playing');
@@ -89,7 +91,11 @@ export default function Home() {
     setScore((prev) => prev + pointsEarned);
 
     if (isCorrect) {
-      setStreak((prev) => prev + 1);
+      setStreak((prev) => {
+        const nextStreak = prev + 1;
+        setMaxStreak((m) => Math.max(m, nextStreak));
+        return nextStreak;
+      });
     } else {
       setStreak(0);
     }
@@ -129,6 +135,7 @@ export default function Home() {
         correctCount,
         wrongCount,
         accuracyPercentage,
+        maxStreak: maxStreak,
         answers: userAnswers,
       };
 

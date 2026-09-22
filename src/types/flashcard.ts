@@ -32,11 +32,12 @@ export interface UserAnswerRecord {
 
 export interface GameSummary {
   deckCategory: string;
-  score: number;
+  score?: number;
   totalQuestions: number;
   correctCount: number;
   wrongCount: number;
   accuracyPercentage: number;
+  maxStreak: number;
   answers: UserAnswerRecord[];
 }
 
