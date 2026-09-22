@@ -218,8 +218,8 @@ export const ScoreScreen: React.FC<ScoreScreenProps> = ({ summary, onRestart, on
               <div
                 key={idx}
                 className={`p-5 rounded-2xl border-2 text-left transition-all ${answer.isCorrect
-                    ? 'bg-emerald-950/40 border-emerald-500/50'
-                    : 'bg-rose-950/40 border-rose-500/50'
+                  ? 'bg-emerald-950/40 border-emerald-500/50'
+                  : 'bg-rose-950/40 border-rose-500/50'
                   }`}
               >
                 <div className="flex items-start justify-between gap-3 mb-3">
@@ -228,8 +228,8 @@ export const ScoreScreen: React.FC<ScoreScreenProps> = ({ summary, onRestart, on
                   </span>
                   <span
                     className={`shrink-0 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${answer.isCorrect
-                        ? 'bg-emerald-500 text-white shadow-md'
-                        : 'bg-rose-500 text-white shadow-md'
+                      ? 'bg-emerald-500 text-white shadow-md'
+                      : 'bg-rose-500 text-white shadow-md'
                       }`}
                   >
                     {answer.isCorrect ? '✓ Correct' : '✕ Wrong'}
