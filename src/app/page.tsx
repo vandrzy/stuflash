@@ -14,6 +14,7 @@ export default function Home() {
   const [activeQuestions, setActiveQuestions] = useState<FlashcardQuestion[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
+  const [streak, setStreak] = useState<number>(0);
   const [userAnswers, setUserAnswers] = useState<UserAnswerRecord[]>([]);
   const [gameSummary, setGameSummary] = useState<GameSummary | null>(null);
 
@@ -73,6 +74,7 @@ export default function Home() {
     setActiveQuestions(selected);
     setCurrentQuestionIndex(0);
     setScore(0);
+    setStreak(0);
     setUserAnswers([]);
     setGameSummary(null);
     setScreenState('playing');
@@ -85,6 +87,12 @@ export default function Home() {
 
     const pointsEarned = isCorrect ? 100 : 0;
     setScore((prev) => prev + pointsEarned);
+
+    if (isCorrect) {
+      setStreak((prev) => prev + 1);
+    } else {
+      setStreak(0);
+    }
 
     const record: UserAnswerRecord = {
       questionId: currentQ.id,
@@ -153,7 +161,7 @@ export default function Home() {
             question={activeQuestions[currentQuestionIndex]}
             currentIndex={currentQuestionIndex}
             totalQuestions={activeQuestions.length}
-            score={score}
+            streak={streak}
             difficulty={activeDifficulty}
             onAnswerSubmit={handleAnswerSubmit}
             onNextQuestion={handleNextQuestion}

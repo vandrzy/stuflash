@@ -8,7 +8,7 @@ interface QuestionViewProps {
   question: FlashcardQuestion;
   currentIndex: number;
   totalQuestions: number;
-  score: number;
+  streak?: number;
   difficulty: DifficultyLevel;
   onAnswerSubmit: (selectedIndex: number) => void;
   onNextQuestion: () => void;
@@ -19,7 +19,7 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
   question,
   currentIndex,
   totalQuestions,
-  score,
+  streak = 0,
   difficulty,
   onAnswerSubmit,
   onNextQuestion,
@@ -108,8 +108,11 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-sm sm:text-base font-black text-[#fbf8e0]">
-
-          <span className="bg-white/20 px-3 py-1 rounded-xl">{score} pts</span>
+          <span className="bg-amber-500/25 border border-amber-400/30 px-3 py-1 rounded-xl flex items-center gap-1.5 shadow-sm text-amber-200">
+            <span>🔥</span>
+            <span>{streak}</span>
+            <span className="text-xs font-bold opacity-90">Streak</span>
+          </span>
         </div>
       </div>
 

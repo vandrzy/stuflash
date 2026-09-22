@@ -49,12 +49,7 @@ export const ScoreScreen: React.FC<ScoreScreenProps> = ({ summary, onRestart, on
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-3 gap-3 sm:gap-4 w-full">
-          <div className="bg-white/10 p-4 rounded-2xl border border-white/20 flex flex-col items-center">
-            <span className="text-xs uppercase font-extrabold text-[#fbf8e0]/80 mb-1">Total Score</span>
-            <span className="text-2xl font-black text-[#fbf8e0]">{summary.score} pts</span>
-          </div>
-
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 w-full">
           <div className="bg-[#116b09]/80 p-4 rounded-2xl border border-white/30 flex flex-col items-center shadow-md">
             <span className="text-xs uppercase font-extrabold text-[#fbf8e0]/90 mb-1">Correct</span>
             <span className="text-2xl font-black text-[#fbf8e0]">{summary.correctCount} / {summary.totalQuestions}</span>
